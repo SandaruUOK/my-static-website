@@ -1,0 +1,58 @@
+name: Deploy to Netlify
+
+# Trigger the workflow on push to main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Checkout the repository code
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Optional: Install dependencies if you have any build process
+    # For a simple static site, this step might not be needed
+    - name: Setup Node.js (if needed)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    # Optional: Install dependencies and build
+    # Uncomment these lines if you have a package.json with build scripts
+    # - name: Install dependencies
+    #   run: npm install
+    #   
+    # - name: Build project
+    #   run: npm run build
+      
+    # Deploy to Netlify
+    - name: Deploy to Netlify
+      uses: nwtgck/actions-netlify@v3.0
+      with:
+        # Publish directory (where your built files are located)
+        publish-dir: '.'
+        # Production branch
+        production-branch: main
+        # GitHub token for PR comments
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        # Deploy message
+        deploy-message: "Deploy from GitHub Actions"
+        # Enable commit comments
+        enable-pull-request-comment: true
+        # Enable commit status
+        enable-commit-comment: true
+        # Enable GitHub deployment API
+        enable-github-deployment: true
+      env:
+        # Netlify auth token (add this to your GitHub secrets)
+        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        # Netlify site ID (add this to your GitHub secrets)
+        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
