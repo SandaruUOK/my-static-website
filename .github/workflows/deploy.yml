@@ -1,4 +1,4 @@
-name: Deploy to Netlify
+name: Deploy to Google Cloud Storage
 
 # Trigger the workflow on push to main branch
 on:
@@ -18,41 +18,74 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    # Optional: Install dependencies if you have any build process
-    # For a simple static site, this step might not be needed
-    - name: Setup Node.js (if needed)
+    # Setup Google Cloud SDK
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: my-static-website-467508
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+        
+    # Optional: Setup Node.js if you have build process
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
         
     # Optional: Install dependencies and build
-    # Uncomment these lines if you have a package.json with build scripts
+    # Uncomment if you add build process later
     # - name: Install dependencies
     #   run: npm install
     #   
     # - name: Build project
     #   run: npm run build
       
-    # Deploy to Netlify
-    - name: Deploy to Netlify
-      uses: nwtgck/actions-netlify@v3.0
-      with:
-        # Publish directory (where your built files are located)
-        publish-dir: '.'
-        # Production branch
-        production-branch: main
-        # GitHub token for PR comments
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        # Deploy message
-        deploy-message: "Deploy from GitHub Actions"
-        # Enable commit comments
-        enable-pull-request-comment: true
-        # Enable commit status
-        enable-commit-comment: true
-        # Enable GitHub deployment API
-        enable-github-deployment: true
-      env:
-        # Netlify auth token (add this to your GitHub secrets)
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        # Netlify site ID (add this to your GitHub secrets)
-        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+    # Deploy to Google Cloud Storage
+    - name: Deploy to Google Cloud Storage
+      run: |
+        # Set bucket name (use a fixed name for your website)
+        BUCKET_NAME="my-static-website-bucket"
+        
+        # Create bucket if it doesn't exist (will skip if exists)
+        gsutil mb gs://${BUCKET_NAME} || echo "Bucket already exists"
+        
+        # Configure bucket for website hosting
+        gsutil web set -m index.html -e 404.html gs://${BUCKET_NAME}
+        
+        # Make bucket publicly readable
+        gsutil iam ch allUsers:objectViewer gs://${BUCKET_NAME}
+        
+        # Remove old files from bucket (optional - for clean deployment)
+        gsutil -m rm -r gs://${BUCKET_NAME}/* || true
+        
+        # Upload new files (exclude unnecessary files during upload)
+        gsutil -m cp -r \
+          --exclude=".git/*" \
+          --exclude=".github/*" \
+          --exclude="*.md" \
+          --exclude="package*.json" \
+          --exclude="*.sh" \
+          --exclude="gcp-key.json" \
+          . gs://${BUCKET_NAME}/
+        
+        # Set cache control for different file types
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.css || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.js || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.png || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.jpg || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=0, must-revalidate" gs://${BUCKET_NAME}/*.html || true
+        
+    # Optional: Invalidate CDN cache (if you set up Cloud CDN later)
+    # - name: Invalidate CDN Cache
+    #   run: |
+    #     gcloud compute url-maps invalidate-cdn-cache ${{ secrets.CDN_URL_MAP }} \
+    #       --path "/*"
+      
+    # Output website URL
+    - name: Website URL
+      run: |
+        BUCKET_NAME="my-static-website-bucket"
+        echo "🌐 Website deployed successfully!"
+        echo "📍 Direct URL: https://storage.googleapis.com/${BUCKET_NAME}/index.html"
+        echo "📍 Website URL: https://${BUCKET_NAME}.storage.googleapis.com"
+        echo "📍 Custom domain URL (if configured): https://your-domain.com"
