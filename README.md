@@ -1,124 +1,73 @@
 # My Static Website
 
-A simple static website with automated deployment using GitHub Actions and Netlify.
+A simple static website with automated deployment using GitHub Actions and Google Cloud Storage.
 
 ## Features
 
-- 📱 Responsive design
-- 🚀 Automated deployment with GitHub Actions
-- 🌐 Hosted on Netlify
-- ✨ Smooth scrolling navigation
-- 🎨 Modern CSS styling
+* 📱 Responsive design
+* 🚀 Automated deployment with GitHub Actions
+* ☁️ Hosted on Google Cloud Storage
+* 🔐 Secure CI/CD pipeline
+
+## Quick Setup
+
+### Prerequisites
+* GitHub account
+* Google Cloud Platform account
+
+### Deployment Setup
+
+1. **Create Google Cloud Project & Service Account**
+   * Go to [Google Cloud Console](https://console.cloud.google.com)
+   * Create service account with **Storage Admin** role
+   * Download JSON key file
+
+2. **Add GitHub Secret**
+   * Repository Settings > Secrets > Actions
+   * Add `GCP_SA_KEY`: Paste JSON key content
+
+3. **Push to GitHub**
+   ```bash
+   git add .
+   git commit -m "Setup deployment"
+   git push origin main
+   ```
+
+## How It Works
+
+Every push to `main` branch automatically:
+1. Authenticates with Google Cloud
+2. Creates/updates storage bucket
+3. Uploads website files
+4. Makes site publicly accessible
+
+**Website URL**: `https://storage.googleapis.com/your-bucket-name/index.html`
+
+## Local Development
+
+```bash
+git clone https://github.com/yourusername/repo-name.git
+cd repo-name
+python -m http.server 8000
+```
+
+Open `http://localhost:8000`
 
 ## Project Structure
 
 ```
-├── index.html          # Main HTML file
-├── styles.css          # CSS styling
-├── script.js           # JavaScript functionality
-├── package.json        # Project configuration
-├── README.md           # This file
-└── .github/
-    └── workflows/
-        └── deploy.yml  # GitHub Actions workflow
+├── index.html
+├── styles.css
+├── script.js
+└── .github/workflows/deploy.yml
 ```
 
-## Getting Started
+## Troubleshooting
 
-### Prerequisites
-
-- GitHub account
-- Netlify account
-- Git installed on your computer
-
-### Local Development
-
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/your-repo-name.git
-   cd your-repo-name
-   ```
-
-2. Open `index.html` in your browser, or serve it locally:
-   ```bash
-   # Using Python 3
-   python -m http.server 8000
-   
-   # Using Python 2
-   python -m SimpleHTTPServer 8000
-   
-   # Using Node.js (if you have http-server installed)
-   npx http-server
-   ```
-
-3. Open `http://localhost:8000` in your browser
-
-### Deployment Setup
-
-1. **Create a Netlify Site:**
-   - Go to [Netlify](https://netlify.com)
-   - Sign up/Sign in
-   - Click "New site from Git"
-   - Connect your GitHub repository
-   - Note your Site ID from Site Settings
-
-2. **Get Netlify Auth Token:**
-   - Go to Netlify User Settings > Applications
-   - Create a new Personal Access Token
-   - Copy the token
-
-3. **Add GitHub Secrets:**
-   - Go to your GitHub repository
-   - Navigate to Settings > Secrets and variables > Actions
-   - Add these secrets:
-     - `NETLIFY_AUTH_TOKEN`: Your Netlify auth token
-     - `NETLIFY_SITE_ID`: Your Netlify site ID
-
-4. **Push to GitHub:**
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
-   ```
-
-### Automatic Deployment
-
-Once set up, every push to the `main` branch will automatically:
-1. Trigger the GitHub Actions workflow
-2. Deploy your site to Netlify
-3. Update your live website
-
-## Customization
-
-### Modifying Content
-- Edit `index.html` to change the website content
-- Update `styles.css` to modify the appearance
-- Modify `script.js` to add new functionality
-
-### Adding Pages
-1. Create new HTML files (e.g., `about.html`, `contact.html`)
-2. Update navigation links in `index.html`
-3. Add corresponding JavaScript for navigation
-
-### Build Process
-If you want to add a build process (e.g., Sass, TypeScript, bundling):
-1. Add dependencies to `package.json`
-2. Add build scripts to `package.json`
-3. Uncomment the build steps in `.github/workflows/deploy.yml`
-4. Update the `publish-dir` in the workflow if needed
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test locally
-5. Submit a pull request
+* **Auth errors**: Check `GCP_SA_KEY` secret is complete JSON
+* **Bucket exists**: Use unique bucket name in workflow
+* **Upload fails**: Verify file paths and service account permissions
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-If you have any questions or need help with setup, please open an issue in this repository.
+MIT License
