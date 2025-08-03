@@ -18,13 +18,23 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    # Authenticate to Google Cloud (Updated method)
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        
     # Setup Google Cloud SDK
-    - name: Setup Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v2
+    - name: Setup Google Cloud CLI
+      uses: google-github-actions/setup-gcloud@v1
       with:
         project_id: my-static-website-467508
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
+        
+    # Verify Authentication (Optional but helpful for debugging)
+    - name: Verify Authentication
+      run: |
+        gcloud auth list
+        gcloud config get-value project
         
     # Optional: Setup Node.js if you have build process
     - name: Setup Node.js
