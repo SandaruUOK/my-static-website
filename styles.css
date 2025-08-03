@@ -71,7 +71,7 @@ main {
 
 /* Hero section */
 .hero {
-    background-image: url('images/background.jpg');
+    
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -133,7 +133,7 @@ main {
 .contact {
     padding: 80px 0;
     background: white;
-    background-image: url('images/download.jpg');
+    
 }
 
 .contact h2 {
