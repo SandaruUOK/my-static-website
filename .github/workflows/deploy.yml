@@ -37,18 +37,12 @@ jobs:
         gcloud config get-value project
         
     # Optional: Setup Node.js if you have build process
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
+    #- name: Setup Node.js
+      #uses: actions/setup-node@v4
+      #with:
+        #node-version: '18'
         
-    # Optional: Install dependencies and build
-    # Uncomment if you add build process later
-    # - name: Install dependencies
-    #   run: npm install
-    #   
-    # - name: Build project
-    #   run: npm run build
+    
       
     # Deploy to Google Cloud Storage
     - name: Deploy to Google Cloud Storage
@@ -83,11 +77,7 @@ jobs:
         gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.jpg || true
         gsutil -m setmeta -h "Cache-Control:public, max-age=0, must-revalidate" gs://${BUCKET_NAME}/*.html || true
         
-    # Optional: Invalidate CDN cache (if you set up Cloud CDN later)
-    # - name: Invalidate CDN Cache
-    #   run: |
-    #     gcloud compute url-maps invalidate-cdn-cache ${{ secrets.CDN_URL_MAP }} \
-    #       --path "/*"
+    
       
     # Output website URL
     - name: Website URL
