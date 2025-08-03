@@ -59,24 +59,22 @@ jobs:
         # Create bucket if it doesn't exist (will skip if exists)
         gsutil mb gs://${BUCKET_NAME} || echo "Bucket already exists"
         
-        # Configure bucket for website hosting
-        gsutil web set -m index.html -e 404.html gs://${BUCKET_NAME}
+        # Note: Website configuration requires additional permissions
+        # Configure bucket for website hosting (uncomment after adding Storage Legacy Bucket Writer role)
+        # gsutil web set -m index.html -e 404.html gs://${BUCKET_NAME}
         
         # Make bucket publicly readable
         gsutil iam ch allUsers:objectViewer gs://${BUCKET_NAME}
         
         # Remove old files from bucket (optional - for clean deployment)
-        gsutil -m rm -r gs://${BUCKET_NAME}/* || true
+        gsutil -m rm -r gs://${BUCKET_NAME}/** || echo "No existing files to remove"
         
-        # Upload new files (exclude unnecessary files during upload)
-        gsutil -m cp -r \
-          --exclude=".git/*" \
-          --exclude=".github/*" \
-          --exclude="*.md" \
-          --exclude="package*.json" \
-          --exclude="*.sh" \
-          --exclude="gcp-key.json" \
-          . gs://${BUCKET_NAME}/
+        # Upload all HTML, CSS, JS, and image files
+        gsutil -m cp *.html gs://${BUCKET_NAME}/ || echo "No HTML files found"
+        gsutil -m cp *.css gs://${BUCKET_NAME}/ || echo "No CSS files found" 
+        gsutil -m cp *.js gs://${BUCKET_NAME}/ || echo "No JS files found"
+        gsutil -m cp *.png gs://${BUCKET_NAME}/ || echo "No PNG files found"
+        gsutil -m cp *.jpg gs://${BUCKET_NAME}/ || echo "No JPG files found"
         
         # Set cache control for different file types
         gsutil -m setmeta -h "Cache-Control:public, max-age=31536000" gs://${BUCKET_NAME}/*.css || true
