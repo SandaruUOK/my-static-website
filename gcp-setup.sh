@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Google Cloud Storage Static Website Setup Script
-# Make sure you've run 'gcloud init' first
 
-# Variables - Update these with your values
+
+
 PROJECT_ID="my-static-website-467508"  
 BUCKET_NAME="my-static-website-bucket"  
 REGION="us-central1"  
@@ -29,7 +29,7 @@ gsutil iam ch allUsers:objectViewer gs://$BUCKET_NAME
 echo "🌐 Configuring static website hosting..."
 gsutil web set -m index.html -e error.html gs://$BUCKET_NAME
 
-# Set up CORS for web access (optional but recommended)
+# Set up CORS for web access 
 cat > cors.json << EOF
 [
   {
@@ -89,5 +89,3 @@ echo "3. Push your code to trigger deployment"
 # Clean up temporary files
 rm cors.json
 
-echo ""
-echo "🎉 Ready to deploy your static website to Google Cloud!"
