@@ -53,8 +53,8 @@ jobs:
     # Deploy to Google Cloud Storage
     - name: Deploy to Google Cloud Storage
       run: |
-        # Set bucket name (use a fixed name for your website)
-        BUCKET_NAME="my-static-website-bucket"
+        # Set bucket name (use a unique name for your website)
+        BUCKET_NAME="my-static-website-467508"
         
         # Create bucket if it doesn't exist (will skip if exists)
         gsutil mb gs://${BUCKET_NAME} || echo "Bucket already exists"
