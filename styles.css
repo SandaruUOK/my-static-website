@@ -75,6 +75,7 @@ main {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    background-color: rgba(5, 126, 196, 0.836);
     color: white;
     padding: 100px 0;
     text-align: center;
